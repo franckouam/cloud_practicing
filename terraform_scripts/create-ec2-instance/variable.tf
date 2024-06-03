@@ -13,10 +13,6 @@ variable "instance_type" {
   type = string
 }
 
-variable "subnet_name" {
-  type = list
-}
-
 variable "key_name" {
   type = string
 }
