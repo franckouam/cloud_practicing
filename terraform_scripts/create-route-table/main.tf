@@ -22,7 +22,7 @@ data "aws_subnet" "public" {
 resource "aws_internet_gateway" "kofra_gw" {
   vpc_id = data.aws_vpc.this.id
   tags = {
-    Name = "kofra_internet_gw"
+    Name = "kofra-internet-gw"
   }
 }
 
@@ -33,7 +33,7 @@ resource "aws_route_table" "route_table" {
     gateway_id = aws_internet_gateway.kofra_gw.id
   }
   tags = {
-    Name = "kofra_route_table"
+    Name = "kofra-route-table"
   }
 
 }

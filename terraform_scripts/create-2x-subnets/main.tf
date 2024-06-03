@@ -15,6 +15,7 @@ data "aws_vpc" "this" {
 resource "aws_subnet" "public" {
   vpc_id     = data.aws_vpc.this.id
   cidr_block = var.cidr_block_public
+  availability_zone = "${var.region}a"
 
   tags = {
     Name = var.subnet_public
@@ -25,7 +26,7 @@ resource "aws_subnet" "public" {
 resource "aws_subnet" "private" {
   vpc_id     = data.aws_vpc.this.id
   cidr_block = var.cidr_block_private
-
+  availability_zone = "${var.region}b"
   tags = {
     Name = var.subnet_private
   }
