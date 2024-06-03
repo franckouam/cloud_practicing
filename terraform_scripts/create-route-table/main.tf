@@ -1,24 +1,49 @@
-#Configure AWS provider
+#Configure aws provider
 provider "aws" {
   region = var.region
 }
 
-#Reading vpc resource
+#Read vpc resource 
 data "aws_vpc" "this" {
   filter {
-    name = "tag:Name"
+    name   = "tag:Name"
     values = var.vpc_name
   }
 }
 
-#Read a subnet resource
-data "aws_subnet" "public" {
-  filter {
-    name = "tag:Name"
-    values = var.subnet_name
+#Create a subnet
+resource "aws_subnet" "public" {
+  vpc_id     = data.aws_vpc.this.id
+  cidr_block = var.cidr_block_public
+  availability_zone = "${var.region}a"
+
+  tags = {
+    Name = var.subnet_public
   }
 }
 
+#Create a subnet
+resource "aws_subnet" "private" {
+  vpc_id     = data.aws_vpc.this.id
+  cidr_block = var.cidr_block_private
+  availability_zone = "${var.region}b"
+  tags = {
+    Name = var.subnet_private
+  }
+}
+
+
+#Capture vpc_id in output variable
+output "vpc_id" {
+  value = data.aws_vpc.this.id
+}
+
+#Capture vpc_cidr_block in output variable
+output "vpc_cidr_block" {
+  value = data.aws_vpc.this.cidr_block
+}
+
+#Creating an internet gateway
 resource "aws_internet_gateway" "kofra_gw" {
   vpc_id = data.aws_vpc.this.id
   tags = {

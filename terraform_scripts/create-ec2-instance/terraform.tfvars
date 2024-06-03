@@ -1,7 +1,14 @@
 region = "us-east-1"
+vpc_name = ["KofraVPC"]
+cidr_block_public = "15.9.97.0/26"
+cidr_block_private = "15.9.97.128/26"
+subnet_public = "kofra-public-subnet"
+subnet_private = "kofra-private-subnet"
+cidr_block = "0.0.0.0/0"
+algorithm = "RSA"
+rsa_bits = 4096
 image_name = ["*Ubuntu*22.04*"]
 instance_name = "kofra_vm"
 instance_type = "t2.nano"
-subnet_name = ["kofra-public-subnet"]
 key_name = "kofra-vm-key"
 security_group_name = ["kofra_allow_ssh"]
