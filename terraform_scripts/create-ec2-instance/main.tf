@@ -84,7 +84,7 @@ resource "aws_security_group" "allow_ssh" {
 #Adding rules for the incoming traffic
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_in" {
   security_group_id = aws_security_group.allow_ssh.id
-  cidr_ipv4         = data.aws_vpc.this.cidr_block
+  cidr_ipv4         = "0.0.0.0/0"
   from_port         = 22
   ip_protocol       = "tcp"
   to_port           = 22
@@ -112,6 +112,7 @@ resource "aws_key_pair" "key_pair" {
 
   provisioner "local-exec" { # Create "kofra_key.pem" to your computer!!
     command = "echo '${tls_private_key.pk.private_key_pem}' > ~/kofra_key.pem"
+    command = "chmod 0600 ~/kofra_key.pem"
   }
 }
 
