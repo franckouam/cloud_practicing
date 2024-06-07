@@ -71,7 +71,7 @@ resource "aws_route_table_association" "route_association" {
 }
 
 #Creating a security group
-resource "aws_security_group" "allow_ssh" {
+resource "aws_security_group" "web_server_security_group" {
   name        = "kofra-ssh-security-group"
   description = "Allow SSH inbound  and outbound traffic"
   vpc_id      = data.aws_vpc.this.id
@@ -83,7 +83,7 @@ resource "aws_security_group" "allow_ssh" {
 
 #Adding rules for the incoming traffic
 resource "aws_vpc_security_group_ingress_rule" "allow_ssh_in" {
-  security_group_id = aws_security_group.allow_ssh.id
+  security_group_id = aws_security_group.web_server_security_group.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = 22
   ip_protocol       = "tcp"
@@ -92,13 +92,20 @@ resource "aws_vpc_security_group_ingress_rule" "allow_ssh_in" {
 
 #Adding rules for the outgoing traffic
 resource "aws_vpc_security_group_egress_rule" "allow_ssh_out" {
-  security_group_id = aws_security_group.allow_ssh.id
+  security_group_id = aws_security_group.web_server_security_group.id
   cidr_ipv4         = "0.0.0.0/0"
   from_port         = -1
   ip_protocol       = "-1"
   to_port           = -1
 }
 
+resource "aws_vpc_security_group_ingress_rule" "allow_http_in" {
+  security_group_id = aws_security_group.web_server_security_group.id
+  cidr_ipv4	    = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port	    = 80
+  to_port	    = 80
+}
 #Creating a TLS private key
 resource "tls_private_key" "pk" {
   algorithm = var.algorithm
@@ -111,8 +118,7 @@ resource "aws_key_pair" "key_pair" {
   public_key = tls_private_key.pk.public_key_openssh
 
   provisioner "local-exec" { # Create "kofra_key.pem" to your computer!!
-    command = "echo '${tls_private_key.pk.private_key_pem}' > ~/kofra_key.pem"
-    command = "chmod 0600 ~/kofra_key.pem"
+    command = "echo '${tls_private_key.pk.private_key_pem}' > ~/kofra_key.pem && chmod 0600 ~/kofra_key.pem"
   }
 }
 
@@ -132,7 +138,7 @@ resource "aws_instance" "terraform_instance" {
   ami = data.aws_ami.ami.id
   instance_type = var.instance_type
   key_name = var.key_name
-  vpc_security_group_ids = [aws_security_group.allow_ssh.id]
+  vpc_security_group_ids = [aws_security_group.web_server_security_group.id]
   subnet_id = aws_subnet.public.id
   associate_public_ip_address = true
   source_dest_check = false
@@ -140,3 +146,4 @@ resource "aws_instance" "terraform_instance" {
     Name = var.instance_name
   }
 }
+
