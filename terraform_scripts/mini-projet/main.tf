@@ -82,14 +82,28 @@ resource "aws_security_group" "frontend_security_group" {
   vpc_id      = data.aws_vpc.this.id
 
   ingress {
-    cidr_ipv4         = "0.0.0.0/0"
-    from_port         = [22, 443, 80]
+    cidr_blocks         = ["0.0.0.0/0"]
+    from_port         = 22
     ip_protocol       = "tcp"
-    to_port           = [22, 443, 80]
+    to_port           = 22
+  }
+
+  ingress {
+    cidr_blocks         = ["0.0.0.0/0"]
+    from_port         = 443
+    ip_protocol       = "tcp"
+    to_port           = 443
+  }
+
+  ingress {
+    cidr_blocks         = ["0.0.0.0/0"]
+    from_port         = 80
+    ip_protocol       = "tcp"
+    to_port           = 80
   }
 
   egress {
-    cidr_ipv4         = "0.0.0.0/0"
+    cidr_blocks         = ["0.0.0.0/0"]
     from_port         = -1
     ip_protocol       = "-1"
     to_port           = -1
