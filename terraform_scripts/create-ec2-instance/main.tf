@@ -134,7 +134,7 @@ data "aws_ami" "ami" {
 }
 
 #Creating an AWS EC2 instance
-resource "aws_instance" "terraform_instance" {
+resource "aws_instance" "kofra_instance" {
   ami = data.aws_ami.ami.id
   instance_type = var.instance_type
   key_name = var.key_name
@@ -147,3 +147,22 @@ resource "aws_instance" "terraform_instance" {
   }
 }
 
+resource "aws_route53_zone" "gintonic" {
+  name = "gintonic-telecom.net"
+}
+
+resource "aws_route53_record" "kofra" {
+  zone_id = aws_route53_zone.gintonic.zone_id
+  name    = "kofra"
+  type    = "A"
+  ttl     = 300
+  records = [aws_instance.kofra_instance.public_ip]
+}
+
+
+output "instance_public_ip" {
+    description = "Public IP address of the EC2 instance"  
+    value       = aws_instance.app_server.public_ip
+}
+
+# TODO: Modify the script in order to create 2 EC2 instances
