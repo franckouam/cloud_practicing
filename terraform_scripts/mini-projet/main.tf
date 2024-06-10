@@ -84,29 +84,29 @@ resource "aws_security_group" "frontend_security_group" {
   ingress {
     cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 22
-    ip_protocol       = "tcp"
+    protocol       = "tcp"
     to_port           = 22
   }
 
   ingress {
     cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 443
-    ip_protocol       = "tcp"
+    protocol       = "tcp"
     to_port           = 443
   }
 
   ingress {
     cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 80
-    ip_protocol       = "tcp"
+    protocol       = "tcp"
     to_port           = 80
   }
 
   egress {
     cidr_blocks         = ["0.0.0.0/0"]
-    from_port         = -1
-    ip_protocol       = "-1"
-    to_port           = -1
+    from_port         = 0
+    protocol       = "0"
+    to_port           = 0
   }
 
   tags = {
@@ -121,17 +121,17 @@ resource "aws_security_group" "streamer_security_group" {
   vpc_id      = data.aws_vpc.this.id
 
   ingress {
-    cidr_ipv4         = var.cidr_block_private
+    cidr_blocks         = [var.cidr_block_private]
     from_port         = 1935
-    ip_protocol       = "tcp"
+    protocol       = "tcp"
     to_port           = 1935
   }
 
   egress {
-    cidr_ipv4         = var.cidr_block_private
-    from_port         = -1
-    ip_protocol       = "-1"
-    to_port           = -1
+    cidr_blocks         = [var.cidr_block_private]
+    from_port         = 0
+    protocol       = "0"
+    to_port           = 0
   }
 
   tags = {
@@ -170,30 +170,31 @@ data "aws_ami" "ami" {
 
 resource "aws_instance" "servers" {
   count = 2
-  key_name = var.key_name
+  key_name = aws_key_pair.key_pair.key_name
   ami           = data.aws_ami.ami.id
   instance_type = var.instance_type
   
   subnet_id = element([aws_subnet.public.id, aws_subnet.private.id], count.index)
-
+  associate_public_ip_address = count.index == 0 ? true : false  # Associe une adresse IP publique uniquement a la première instance
+  source_dest_check = false
   tags = {
     Name = element([var.i_frontend_name, var.i_streamer_name], count.index)
   }
 }
 
-resource "aws_route53_zone" "intuitivesoft" {
+data "aws_route53_zone" "intuitivesoft" {
   name = "devops.intuitivesoft.cloud"
 }
 
 resource "aws_route53_record" "kmh" {
-  zone_id = aws_route53_zone.intuitivesoft.zone_id
+  zone_id = data.aws_route53_zone.intuitivesoft.zone_id
   name    = "kmh"
   type    = "A"
   ttl     = 300
-  records = [aws_instance.kmh_instance.public_ip]
+  records = [aws_instance.servers[0].public_ip]
 }
 
 output "instance_public_ip" {
     description = "Public IP address of the Webserver EC2 instance"  
-    value       = aws_instance.frontend.public_ip
+    value       = aws_instance.servers[0].public_ip
 }
