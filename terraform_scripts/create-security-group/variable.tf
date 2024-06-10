@@ -7,6 +7,17 @@ variable "vpc_name" {
 variable "cidr_block" {
   type = string
 }
-variable "subnet_name" {
-  type = list
+
+variable "subnet_public" {
+  type = string
+}
+variable "subnet_private" {
+  type = string
+}
+variable "cidr_block_public" {
+  type = string
+}
+
+variable "cidr_block_private" {
+  type = string
 }

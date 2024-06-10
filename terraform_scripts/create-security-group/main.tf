@@ -66,7 +66,7 @@ resource "aws_route_table" "route_table" {
 
 #Adding an association for the created routing table
 resource "aws_route_table_association" "route_association" {
-  subnet_id      = data.aws_subnet.public.id
+  subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.route_table.id
 }
 
