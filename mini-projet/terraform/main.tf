@@ -104,9 +104,9 @@ resource "aws_security_group" "frontend_security_group" {
 
   ingress {
     cidr_blocks = [aws_subnet.private.cidr_block]
-    from_port   = 0
+    from_port   = -1
     protocol    = "icmp"
-    to_port     = 0
+    to_port     = -1
   }
 
   egress {
@@ -143,9 +143,9 @@ resource "aws_security_group" "streamer_security_group" {
 
   ingress {
     cidr_blocks = [aws_subnet.public.cidr_block]
-    from_port   = 0
+    from_port   = -1
     protocol    = "icmp"
-    to_port     = 0
+    to_port     = -1
   }
 
   egress {
@@ -196,7 +196,7 @@ resource "aws_instance" "servers" {
   ami           = data.aws_ami.ami.id
   instance_type = var.instance_type
   vpc_security_group_ids = element([[aws_security_group.frontend_security_group.id], [aws_security_group.streamer_security_group.id]], count.index)
-  subnet_id = element([aws_subnet.public.id], [aws_subnet.private.id], count.index)
+  subnet_id = element([aws_subnet.public.id, aws_subnet.private.id], count.index)
   associate_public_ip_address = true
   source_dest_check = false
   tags = {
