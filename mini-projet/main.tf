@@ -47,7 +47,7 @@ output "vpc_cidr_block" {
 resource "aws_internet_gateway" "kmh_gw" {
   vpc_id = data.aws_vpc.this.id
   tags = {
-    Name = "kmh-internet-gw"
+    Name = var.internet_gw_name
   }
 }
 
@@ -59,7 +59,7 @@ resource "aws_route_table" "route_table" {
     gateway_id = aws_internet_gateway.kmh_gw.id
   }
   tags = {
-    Name = "kmh-route-table"
+    Name = var.route_table_name
   }
 
 }
@@ -102,15 +102,22 @@ resource "aws_security_group" "frontend_security_group" {
     to_port           = 80
   }
 
+  ingress {
+    cidr_blocks = [aws_subnet.private.cidr_block]
+    from_port   = 0
+    protocol    = "icmp"
+    to_port     = 0
+  }
+
   egress {
     cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 0
-    protocol       = "0"
+    protocol       = "-1"
     to_port           = 0
   }
 
   tags = {
-    Name = "sg_frontend"
+    Name = var.frontend_sg_name
   }
 }
 
@@ -121,21 +128,35 @@ resource "aws_security_group" "streamer_security_group" {
   vpc_id      = data.aws_vpc.this.id
 
   ingress {
+    cidr_blocks         = ["0.0.0.0/0"]
+    from_port         = 22
+    protocol       = "tcp"
+    to_port           = 22
+  }
+
+  ingress {
     cidr_blocks         = [var.cidr_block_private]
     from_port         = 1935
     protocol       = "tcp"
     to_port           = 1935
   }
 
+  ingress {
+    cidr_blocks = [aws_subnet.public.cidr_block]
+    from_port   = 0
+    protocol    = "icmp"
+    to_port     = 0
+  }
+
   egress {
     cidr_blocks         = [var.cidr_block_private]
     from_port         = 0
-    protocol       = "0"
+    protocol       = "-1"
     to_port           = 0
   }
 
   tags = {
-    Name = "sg_streamer"
+    Name = var.streamer_sg_name
   }
 }
 
@@ -168,13 +189,14 @@ data "aws_ami" "ami" {
 }
 
 
+#Creating the 2 EC2 instances
 resource "aws_instance" "servers" {
   count = 2
   key_name = aws_key_pair.key_pair.key_name
   ami           = data.aws_ami.ami.id
   instance_type = var.instance_type
-  vpc_security_group_ids = element([[aws_security_group.frontend_security_group.id], [aws_security_group.streamer_security_group.id]], count.index)  
-  subnet_id = element([aws_subnet.public.id, aws_subnet.private.id], count.index)
+  vpc_security_group_ids = element([[aws_security_group.frontend_security_group.id], [aws_security_group.streamer_security_group.id]], count.index)
+  subnet_id = element([aws_subnet.public.id], [aws_subnet.private.id], count.index)
   associate_public_ip_address = true
   source_dest_check = false
   tags = {
@@ -182,13 +204,16 @@ resource "aws_instance" "servers" {
   }
 }
 
+#Fetching a Route53 zone
 data "aws_route53_zone" "intuitivesoft" {
   name = "devops.intuitivesoft.cloud"
 }
 
-resource "aws_route53_record" "kmh" {
+
+#Creating a new Route53 DNS record
+resource "aws_route53_record" "kmh_record" {
   zone_id = data.aws_route53_zone.intuitivesoft.zone_id
-  name    = "kmh"
+  name    = var.dns_name
   type    = "A"
   ttl     = 300
   records = [aws_instance.servers[0].public_ip]

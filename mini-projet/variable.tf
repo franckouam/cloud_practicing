@@ -56,3 +56,25 @@ variable "sg_frontend_name" {
 variable "sg_streamer_name" {
   type = string
 }
+
+variable "internet_gw_name" {
+  type = string
+}
+
+
+variable "route_table_name" {
+  type = string
+}
+
+
+variable "frontend_sg_name" {
+  type = string
+}
+
+variable "streamer_sg_name" {
+  type = string
+}
+
+variable "dns_name" {
+  type = string
+}
