@@ -173,9 +173,9 @@ resource "aws_instance" "servers" {
   key_name = aws_key_pair.key_pair.key_name
   ami           = data.aws_ami.ami.id
   instance_type = var.instance_type
-  
+  vpc_security_group_ids = element([[aws_security_group.frontend_security_group.id], [aws_security_group.streamer_security_group.id]], count.index)  
   subnet_id = element([aws_subnet.public.id, aws_subnet.private.id], count.index)
-  associate_public_ip_address = count.index == 0 ? true : false  # Associe une adresse IP publique uniquement a la première instance
+  associate_public_ip_address = true
   source_dest_check = false
   tags = {
     Name = element([var.i_frontend_name, var.i_streamer_name], count.index)
@@ -194,7 +194,12 @@ resource "aws_route53_record" "kmh" {
   records = [aws_instance.servers[0].public_ip]
 }
 
-output "instance_public_ip" {
+output "frontend_public_ip" {
     description = "Public IP address of the Webserver EC2 instance"  
     value       = aws_instance.servers[0].public_ip
+}
+
+output "streamer_public_ip" {
+    description = "Public IP address of the Streamer EC2 instance"  
+    value       = aws_instance.servers[1].public_ip
 }
