@@ -174,8 +174,8 @@ resource "aws_instance" "servers" {
   key_name = aws_key_pair.key_pair.key_name
   ami           = data.aws_ami.ami.id
   instance_type = var.instance_type
-  vpc_security_group_ids = element([aws_security_group.frontend_security_group.id, aws_security_group.streamer_security_group.id], count.index)
-  subnet_id = element([aws_subnet.public.id, aws_subnet.private.id], count.index)
+  vpc_security_group_ids = [element([aws_security_group.frontend_security_group.id, aws_security_group.streamer_security_group.id], count.index)]
+  subnet_id = element([aws_subnet.public.id], [aws_subnet.private.id], count.index)
   associate_public_ip_address = count.index == 0 ? true : false  # Associe une adresse IP publique uniquement a la première instance
   source_dest_check = false
   tags = {
