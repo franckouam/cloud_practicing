@@ -1,0 +1,16 @@
+region = "us-east-1"
+vpc_name = ["kmh-vpc"]
+cidr_block_public = "10.20.0.0/24"
+cidr_block_private = "10.20.128.0/24"
+subnet_public = "kmh-public-subnet"
+subnet_private = "kmh-private-subnet"
+cidr_block = "0.0.0.0/0"
+algorithm = "RSA"
+rsa_bits = 4096
+image_name = ["*Ubuntu*22.04*"]
+instance_type = "t2.nano"
+key_name = "kmh-vm-key"
+i_frontend_name = "kmh-frontend"
+i_streamer_name = "kmh-streamer"
+sg_frontend_name = "kmh-frontend-sg"
+sg_streamer_name = "kmh-streamer-sg"
