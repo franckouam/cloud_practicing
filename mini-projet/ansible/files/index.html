@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MPEG-DASH and HLS Player</title>
+    <!-- Include video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.17.0/video-js.css" rel="stylesheet">
+    <!-- Include video.js library -->
+    <script src="https://vjs.zencdn.net/7.17.0/video.min.js"></script>
+    <!-- Include dash.js library -->
+    <script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <!-- Include videojs-contrib-dash plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-dash@2.11.0/dist/videojs-dash.min.js"></script>
+    <!-- Include videojs-contrib-hls plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/dist/videojs-contrib-hls.min.js"></script>
+</head>
+<body>
+
+<div>
+    <h1>MPEG-DASH and HLS Player</h1>
+
+    <video id="videoPlayerHLS" class="video-js vjs-default-skin" controls width="640" height="360"></video>
+
+</div>
+
+<script>
+    (function() {
+        //var player = videojs('videoPlayer');
+        var playerHLS = videojs('videoPlayerHLS');
+
+        // Determine the source type (DASH or HLS) and set up the player
+        //var dashSource = 'http://3.86.242.26/hls/stream.m3u8'; // Replace with your DASH manifest URL

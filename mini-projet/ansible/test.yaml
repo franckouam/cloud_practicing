@@ -1,0 +1,8 @@
+---
+- name: Get OS version on web servers
+  hosts: streamer
+  gather_facts: yes
+  tasks:
+    - name: Print OS version
+      debug:
+        msg: "The OS version on {{ inventory_hostname }} is {{ ansible_distribution }} {{ ansible_distribution_version }}"

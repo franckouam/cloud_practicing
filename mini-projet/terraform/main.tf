@@ -104,9 +104,9 @@ resource "aws_security_group" "frontend_security_group" {
 
   ingress {
     cidr_blocks = [aws_subnet.private.cidr_block]
-    from_port   = -1
+    from_port   = 0
     protocol    = "icmp"
-    to_port     = -1
+    to_port     = 0
   }
 
   egress {
@@ -135,21 +135,22 @@ resource "aws_security_group" "streamer_security_group" {
   }
 
   ingress {
-    cidr_blocks         = [var.cidr_block_private]
+    cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 1935
     protocol       = "tcp"
     to_port           = 1935
   }
 
+  
   ingress {
-    cidr_blocks = [aws_subnet.public.cidr_block]
-    from_port   = -1
+    cidr_blocks = [aws_subnet.private.cidr_block]
+    from_port   = 0
     protocol    = "icmp"
-    to_port     = -1
+    to_port     = 0
   }
 
   egress {
-    cidr_blocks         = [var.cidr_block_private]
+    cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 0
     protocol       = "-1"
     to_port           = 0

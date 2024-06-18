@@ -1,0 +1,51 @@
+---
+- name: Install necessary packages
+  gather_facts: yes
+  hosts: streamer
+  become: true
+
+  vars_files:
+    - vars/generic.yaml
+
+  tasks:
+  - name: Install libnginx-mod-rtmp and ffmpeg
+    ansible.builtin.apt:
+      update_cache: yes
+      pkg:
+        - nginx
+        - libnginx-mod-rtmp
+        - ffmpeg
+      state: present
+
+  - name: Deploy Nginx configuration
+    template:
+      src: templates/streamer.conf.j2
+      dest: /etc/nginx/nginx.conf
+      mode: '0644'
+    notify:
+      - Restart Nginx
+
+  - name: Copy FFmpeg script
+    ansible.builtin.copy:
+      src: files/ffmpeg.sh
+      dest: /usr/local/bin/ffmpeg.sh
+      mode: '0755'
+    become: true
+
+  - name: Download a video file
+    get_url:
+      url: https://videos.pexels.com/video-files/19880357/19880357-uhd_3840_2160_24fps.mp4
+      dest: ~/video.mp4
+
+  - name: Start FFmpeg for transcoding
+    shell: /usr/local/bin/ffmpeg.sh
+    async: 600
+    poll: 0
+    ignore_errors: yes
+    become: true
+
+  handlers:
+  - name: Restart Nginx
+    service:
+      name: nginx
+      state: restarted
