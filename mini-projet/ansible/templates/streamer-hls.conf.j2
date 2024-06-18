@@ -1,0 +1,21 @@
+# Serveur HTTP pour servir les fichiers HLS et les pages web
+    server {
+        listen 80;
+        server_name {{ streamer_ip }};
+
+        location / {
+            root /var/www/html;
+            index index.html index.htm;
+            add_header Cache-Control "public, max-age=3600";
+        }
+
+        location /hls {
+            types {
+                application/vnd.apple.mpegurl m3u8;
+                video/mp2t ts;
+            }
+            root /tmp;
+            add_header Cache-Control no-cache;
+            add_header Access-Control-Allow-Origin *;
+        }
+    }

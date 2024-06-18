@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMHFlix Video Player</title>
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/videojs-netflix-skin@1.0.0/dist/videojs-netflix-skin.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #141414;
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            font-size: 3em;
+            margin: 20px 0;
+        }
+        .video-container {
+            position: relative;
+            width: 960px;
+        }
+        .video-js .vjs-big-play-button {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .interactions {
+            display: flex;
+            justify-content: space-between;
+            width: 960px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .interactions button, .interactions input {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+        }
+        .interactions input {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .reactions {
+            display: none;
+            gap: 10px;
+            position: absolute;
+            top: -50px;
+            left: 0;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .reactions button {
+            font-size: 1.5em;
+            padding: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .comments {
+            width: 960px;
+            background-color: #222;
+            padding: 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .comment {
+            margin-bottom: 10px;
+        }
+        .comment .author {
+            font-weight: bold;
+        }
+        .comment .text {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>KMHFlix</h1>
+    <div class="video-container">
+        <video id="my-video" class="video-js vjs-default-skin vjs-netflix" controls preload="auto" width="960" height="540" data-setup='{}'>
+            <source src="http://{{ streamer_ip }}/hls/stream.m3u8" type="application/x-mpegURL">
+        </video>
+    </div>
+    <div class="interactions">
+        <div class="like-container">
+            <button id="like-button">Like 👍</button>
+            <div class="reactions" id="reactions-container">
+                <button class="reaction-button" data-reaction="like">👍</button>
+                <button class="reaction-button" data-reaction="love">❤️</button>
+                <button class="reaction-button" data-reaction="haha">😂</button>
+                <button class="reaction-button" data-reaction="wow">😮</button>
+                <button class="reaction-button" data-reaction="sad">😢</button>
+                <button class="reaction-button" data-reaction="angry">😡</button>
+            </div>
+        </div>
+        <input type="text" id="comment-input" placeholder="Add a comment..." />
+        <button id="comment-button">Comment</button>
+    </div>
+    <div class="comments" id="comments-section">
+        <div class="comment" id="template-comment" style="display: none;">
+            <span class="author">User:</span><span class="text"></span>
+        </div>
+    </div>
+
+    <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-hls@5.15.0/videojs-contrib-hls.min.js"></script>
+    <script>
+        document.querySelectorAll('.reaction-button').forEach(button => {
+            button.addEventListener('click', function() {
+                alert('You reacted with: ' + this.dataset.reaction);
+            });
+        });
+
+        document.getElementById('comment-button').addEventListener('click', function() {
+            var commentText = document.getElementById('comment-input').value;
+            if (commentText.trim()) {
+                var commentTemplate = document.getElementById('template-comment');
+                var newComment = commentTemplate.cloneNode(true);
+                newComment.style.display = 'block';
+                newComment.querySelector('.text').innerText = commentText;
+                document.getElementById('comments-section').appendChild(newComment);
+                document.getElementById('comment-input').value = '';
+            }
+        });
+
+        const likeButton = document.getElementById('like-button');
+        const reactionsContainer = document.getElementById('reactions-container');
+
+        likeButton.addEventListener('mouseover', function() {
+            reactionsContainer.style.display = 'flex';
+        });
+
+        likeButton.addEventListener('mouseout', function() {
+            setTimeout(function() {
+                if (!reactionsContainer.matches(':hover')) {
+                    reactionsContainer.style.display = 'none';
+                }
+            }, 200);
+        });
+
+        reactionsContainer.addEventListener('mouseleave', function() {
+            reactionsContainer.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

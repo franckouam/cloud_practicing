@@ -7,8 +7,8 @@
   
   tasks:  
   - name: change index.html
-    ansible.builtin.copy:
-      src: files/index.html
+    ansible.builtin.template:
+      src: templates/index.html.j2
       dest: /var/www/{{domain}}/index.html
       mode: '0775'
       owner: "{{ ansible_user }}"

@@ -17,13 +17,23 @@
         - ffmpeg
       state: present
 
-  - name: Deploy Nginx configuration
+  - name: Deploy Nginx general configuration
     template:
-      src: templates/streamer.conf.j2
+      src: templates/streamer-nginx.conf.j2
       dest: /etc/nginx/nginx.conf
       mode: '0644'
     notify:
       - Restart Nginx
+
+  - name: deploy new site configuration
+    ansible.builtin.template:
+      src: templates/strealer-hls.conf.j2
+      dest: /etc/nginx/sites-enabled/streamer
+      owner: root
+      group: root
+      mode: '0644'
+    notify: restart nginx
+
 
   - name: Copy FFmpeg script
     ansible.builtin.copy:
@@ -34,7 +44,7 @@
 
   - name: Download a video file
     get_url:
-      url: https://videos.pexels.com/video-files/19880357/19880357-uhd_3840_2160_24fps.mp4
+      url: https://www.pexels.com/download/video/856925/
       dest: ~/video.mp4
 
   - name: Start FFmpeg for transcoding
