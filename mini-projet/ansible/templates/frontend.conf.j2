@@ -8,14 +8,11 @@ server {
   }
 
   location /hls {
-            proxy_pass http://3.86.242.26:1935/tmp/hls; 
+            proxy_pass http://{{ streamer_ip }}:8080/hls;
             proxy_set_header Host $host;
-            proxy_buffering off;
-
-            types {
-                application/vnd.apple.mpegurl m3u8;
-                video/mp2t ts;
-            }
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
 
             add_header Cache-Control no-cache;
             add_header Access-Control-Allow-Origin *;

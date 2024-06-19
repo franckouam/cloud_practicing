@@ -23,11 +23,11 @@
       dest: /etc/nginx/nginx.conf
       mode: '0644'
     notify:
-      - Restart Nginx
+      - restart nginx
 
   - name: deploy new site configuration
     ansible.builtin.template:
-      src: templates/strealer-hls.conf.j2
+      src: templates/streamer-hls.conf.j2
       dest: /etc/nginx/sites-enabled/streamer
       owner: root
       group: root
@@ -44,7 +44,7 @@
 
   - name: Download a video file
     get_url:
-      url: https://www.pexels.com/download/video/856925/
+      url: https://www.pexels.com/download/video/20576968/
       dest: ~/video.mp4
 
   - name: Start FFmpeg for transcoding
@@ -55,7 +55,7 @@
     become: true
 
   handlers:
-  - name: Restart Nginx
-    service:
-      name: nginx
-      state: restarted
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
