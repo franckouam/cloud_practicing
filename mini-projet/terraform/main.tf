@@ -82,6 +82,13 @@ resource "aws_security_group" "frontend_security_group" {
   vpc_id      = data.aws_vpc.this.id
 
   ingress {
+    cidr_blocks         = [var.cidr_block_private]
+    from_port         = 0
+    protocol       = "-1"
+    to_port           = 0
+  }
+
+  ingress {
     cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 22
     protocol       = "tcp"
@@ -128,6 +135,13 @@ resource "aws_security_group" "streamer_security_group" {
   vpc_id      = data.aws_vpc.this.id
 
   ingress {
+    cidr_blocks         = [var.cidr_block_public]
+    from_port         = 0
+    protocol       = "-1"
+    to_port           = 0
+  }
+
+  ingress {
     cidr_blocks         = ["0.0.0.0/0"]
     from_port         = 22
     protocol       = "tcp"
@@ -145,7 +159,7 @@ resource "aws_security_group" "streamer_security_group" {
   ingress {
     cidr_blocks = [aws_subnet.private.cidr_block]
     from_port   = 0
-    protocol    = "icmp"
+    protocol    = "-1"
     to_port     = 0
   }
 
@@ -225,7 +239,27 @@ output "frontend_public_ip" {
     value       = aws_instance.servers[0].public_ip
 }
 
+output "frontend_private_ip" {
+    description = "Private IP address of the Webserver EC2 instance"  
+    value       = aws_instance.servers[0].private_ip
+}
+
 output "streamer_public_ip" {
     description = "Public IP address of the Streamer EC2 instance"  
     value       = aws_instance.servers[1].public_ip
+}
+
+output "streamer_private_ip" {
+    description = "Private IP address of the Streamer EC2 instance"  
+    value       = aws_instance.servers[1].private_ip
+}
+
+output "frontend_id" {
+    description = "Instance ID of Frontend"  
+    value       = aws_instance.servers[0].id
+}
+
+output "streamer_id" {
+    description = "Instance ID of Streamer"  
+    value       = aws_instance.servers[1].id
 }
